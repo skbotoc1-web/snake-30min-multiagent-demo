@@ -4,6 +4,7 @@ import argparse
 import random
 from collections import deque
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Deque, Iterable, Tuple
 
 Pos = Tuple[int, int]
@@ -41,6 +42,22 @@ def create_game(width: int = 12, height: int = 8, seed: int | None = None) -> Ga
     snake = deque([center, (center[0], center[1] - 1), (center[0], center[1] - 2)])
     food = _spawn_food(width, height, snake, rng)
     return GameState(width=width, height=height, snake=snake, direction="D", food=food)
+
+
+def load_high_score(path: Path) -> int:
+    if not path.exists():
+        return 0
+    try:
+        return max(0, int(path.read_text(encoding="utf-8").strip() or "0"))
+    except ValueError:
+        return 0
+
+
+def save_high_score(path: Path, score: int) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    current = load_high_score(path)
+    if score > current:
+        path.write_text(str(score), encoding="utf-8")
 
 
 def step(state: GameState, direction: str | None = None, seed: int | None = None) -> GameState:
@@ -134,6 +151,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Scripted Moves, z.B. WWAASD (für non-interactive Runs)",
     )
+    parser.add_argument(
+        "--highscore-file",
+        type=Path,
+        default=Path(".snake/highscore.txt"),
+        help="Pfad für Highscore-Speicherung",
+    )
+    parser.add_argument(
+        "--reset-highscore",
+        action="store_true",
+        help="Setzt den Highscore vor dem Run auf 0",
+    )
     return parser
 
 
@@ -144,10 +172,17 @@ def main() -> int:
     if args.width < 5 or args.height < 5:
         parser.error("width/height müssen jeweils >= 5 sein")
 
+    if args.reset_highscore and args.highscore_file.exists():
+        args.highscore_file.unlink()
+
+    highscore_before = load_high_score(args.highscore_file)
+
     if args.moves is not None:
         state = run_scripted(args.moves, width=args.width, height=args.height, seed=args.seed)
         print(render(state))
         print("Final Score:", state.score)
+        save_high_score(args.highscore_file, state.score)
+        print("Highscore:", load_high_score(args.highscore_file), f"(vorher: {highscore_before})")
         return 0 if not state.game_over else 1
 
     run_cli(width=args.width, height=args.height, seed=args.seed)

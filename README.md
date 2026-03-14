@@ -39,3 +39,18 @@ Weitere Optionen:
 ```bash
 python3 src/snake_game.py --help
 ```
+
+
+## Highscore
+
+Der beste Score kann gespeichert werden:
+
+```bash
+python3 src/snake_game.py --moves WWAASD --highscore-file .snake/highscore.txt
+```
+
+Zurücksetzen:
+
+```bash
+python3 src/snake_game.py --reset-highscore --moves DD
+```

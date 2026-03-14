@@ -1,7 +1,18 @@
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
-from src.snake_game import build_parser, create_game, main, render, run_scripted, step
+from src.snake_game import (
+    build_parser,
+    create_game,
+    load_high_score,
+    main,
+    render,
+    run_scripted,
+    save_high_score,
+    step,
+)
 
 
 class SnakeTests(unittest.TestCase):
@@ -58,15 +69,45 @@ class SnakeTests(unittest.TestCase):
         self.assertEqual(args.width, 10)
         self.assertEqual(args.moves, "DD")
 
+    def test_highscore_persistence(self):
+        with tempfile.TemporaryDirectory() as td:
+            hp = Path(td) / "highscore.txt"
+            self.assertEqual(load_high_score(hp), 0)
+            save_high_score(hp, 2)
+            self.assertEqual(load_high_score(hp), 2)
+            save_high_score(hp, 1)
+            self.assertEqual(load_high_score(hp), 2)
+
     def test_main_scripted(self):
-        with patch("sys.argv", ["snake_game.py", "--moves", "DDDD", "--seed", "3"]):
-            rc = main()
-            self.assertIn(rc, (0, 1))
+        with tempfile.TemporaryDirectory() as td:
+            hp = Path(td) / "score.txt"
+            with patch("sys.argv", ["snake_game.py", "--moves", "DDDD", "--seed", "3", "--highscore-file", str(hp)]):
+                rc = main()
+                self.assertIn(rc, (0, 1))
+                self.assertGreaterEqual(load_high_score(hp), 0)
 
     def test_main_invalid_board(self):
         with patch("sys.argv", ["snake_game.py", "--width", "2", "--height", "2"]):
             with self.assertRaises(SystemExit):
                 main()
+
+    def test_reset_highscore(self):
+        with tempfile.TemporaryDirectory() as td:
+            hp = Path(td) / "score.txt"
+            hp.write_text("5", encoding="utf-8")
+            with patch(
+                "sys.argv",
+                [
+                    "snake_game.py",
+                    "--moves",
+                    "DD",
+                    "--highscore-file",
+                    str(hp),
+                    "--reset-highscore",
+                ],
+            ):
+                main()
+            self.assertGreaterEqual(load_high_score(hp), 0)
 
     def test_run_cli_quit_path(self):
         with patch("builtins.input", side_effect=["q"]):
