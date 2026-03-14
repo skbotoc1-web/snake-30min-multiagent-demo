@@ -15,3 +15,13 @@ Steuerung: `W A S D` + Enter, `q` beendet.
 ```bash
 python3 -m unittest discover -s tests -v
 ```
+
+
+## Dev checks
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+coverage run -m unittest discover -s tests -v
+coverage report -m --fail-under=85
+```
