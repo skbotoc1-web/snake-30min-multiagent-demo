@@ -54,3 +54,13 @@ Zurücksetzen:
 ```bash
 python3 src/snake_game.py --reset-highscore --moves DD
 ```
+
+
+## Makefile Targets
+
+```bash
+make setup
+make lint
+make test
+make coverage
+```

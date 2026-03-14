@@ -81,10 +81,11 @@ class SnakeTests(unittest.TestCase):
     def test_main_scripted(self):
         with tempfile.TemporaryDirectory() as td:
             hp = Path(td) / "score.txt"
-            with patch("sys.argv", ["snake_game.py", "--moves", "DDDD", "--seed", "3", "--highscore-file", str(hp)]):
-                rc = main()
-                self.assertIn(rc, (0, 1))
-                self.assertGreaterEqual(load_high_score(hp), 0)
+            with patch("builtins.print"):
+                with patch("sys.argv", ["snake_game.py", "--moves", "DDDD", "--seed", "3", "--highscore-file", str(hp)]):
+                    rc = main()
+                    self.assertIn(rc, (0, 1))
+                    self.assertGreaterEqual(load_high_score(hp), 0)
 
     def test_main_invalid_board(self):
         with patch("sys.argv", ["snake_game.py", "--width", "2", "--height", "2"]):
@@ -95,18 +96,19 @@ class SnakeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             hp = Path(td) / "score.txt"
             hp.write_text("5", encoding="utf-8")
-            with patch(
-                "sys.argv",
-                [
-                    "snake_game.py",
-                    "--moves",
-                    "DD",
-                    "--highscore-file",
-                    str(hp),
-                    "--reset-highscore",
-                ],
-            ):
-                main()
+            with patch("builtins.print"):
+                with patch(
+                    "sys.argv",
+                    [
+                        "snake_game.py",
+                        "--moves",
+                        "DD",
+                        "--highscore-file",
+                        str(hp),
+                        "--reset-highscore",
+                    ],
+                ):
+                    main()
             self.assertGreaterEqual(load_high_score(hp), 0)
 
     def test_run_cli_quit_path(self):
