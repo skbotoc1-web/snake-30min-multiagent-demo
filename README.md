@@ -1,5 +1,7 @@
 # Snake 30min Demo
 
+[![CI](https://github.com/skbotoc1-web/snake-30min-multiagent-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/skbotoc1-web/snake-30min-multiagent-demo/actions/workflows/ci.yml)
+
 Minimal Snake in pure Python (keine externen Dependencies).
 
 ## Start

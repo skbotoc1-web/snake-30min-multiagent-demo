@@ -1,0 +1,39 @@
+name: Bug Report
+description: Fehler melden
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Zusammenfassung
+      description: Was ist kaputt?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduktion
+      description: Schritte zum Reproduzieren
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsächliches Verhalten
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version/Commit
+      placeholder: z.B. v0.1.0 oder SHA
