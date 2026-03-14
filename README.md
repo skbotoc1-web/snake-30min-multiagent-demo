@@ -27,3 +27,15 @@ ruff check .
 coverage run -m unittest discover -s tests -v
 coverage report -m --fail-under=85
 ```
+
+## Non-interactive Run
+
+```bash
+python3 src/snake_game.py --moves WWAASD --seed 42
+```
+
+Weitere Optionen:
+
+```bash
+python3 src/snake_game.py --help
+```
